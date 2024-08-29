@@ -16,6 +16,7 @@ class Pizza(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(default='some default description')
 
     def __str__(self):
         return self.name

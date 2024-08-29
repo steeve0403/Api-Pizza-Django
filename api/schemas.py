@@ -12,3 +12,4 @@ class PizzaSchema(Schema):
 class IngredientSchema(Schema):
     id: int = None
     name: str
+    description: str
