@@ -13,7 +13,8 @@ router = Router()
 # ---------- PIZZAS ---------- #
 @router.get("/pizzas", response=list[PizzaSchema])
 def list_pizzas(request):
-    return Pizza.objects.all()
+    pizzas = Pizza.objects.all()
+    return [PizzaSchema.from_orm(pizza) for pizza in pizzas]
 
 
 @router.get("/pizzas/{pizza_id}", response=PizzaSchema)

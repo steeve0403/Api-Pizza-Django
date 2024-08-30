@@ -1,6 +1,8 @@
 from ninja import Schema
 from pydantic import validator
 
+from api.models import Pizza
+
 
 class CategorySchema(Schema):
     id: int
@@ -103,6 +105,19 @@ class PizzaSchema(Schema):
     vegetarian: bool
     available: bool
     ingredients: list[IngredientSchema] = []
-    default_image: ImageSchema = None
-    custom_images: list[ImageSchema] = []
+    image: ImageSchema
     categories: list[CategorySchema] = []
+
+    @staticmethod
+    def from_orm(obj: Pizza):
+        return PizzaSchema(
+            id=obj.id,
+            name=obj.name,
+            description=obj.description,
+            price=obj.price,
+            vegetarian=obj.vegetarian,
+            available=obj.available,
+            ingredients=obj.ingredients,
+            image=ImageSchema.from_orm(obj.get_image())
+        )
+

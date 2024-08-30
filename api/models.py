@@ -3,12 +3,14 @@ from django.db.models.signals import post_save, post_delete
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
+
 class Image(models.Model):
     image = models.ImageField(upload_to='images/')
     description = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.description or f"Image {self.id}"
+
 
 class Ingredient(models.Model):
     TYPE_CHOICES = [
@@ -30,12 +32,15 @@ class Ingredient(models.Model):
     def clean(self):
         if self.type == 'meat' and self.name.lower() in ['ham', 'bacon']:
             raise ValidationError('This ingredient cannot be added to vegetarian pizzas.')
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
+
 
 class Pizza(models.Model):
     name = models.CharField(max_length=100)
@@ -45,7 +50,6 @@ class Pizza(models.Model):
     vegetarian = models.BooleanField(default=False)
     available = models.BooleanField(default=True)
     ingredients = models.ManyToManyField(Ingredient, related_name='pizzas')
-    default_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, related_name='default_pizzas')
     custom_images = models.ManyToManyField(Image, related_name='custom_pizzas', blank=True)
 
     def __str__(self):
@@ -57,13 +61,10 @@ class Pizza(models.Model):
         if not self.price:
             raise ValidationError("A pizza must have a price.")
 
-
-    def get_default_image_url(self):
-        if self.default_image:
-            return self.default_image.image.url
-        elif self.custom_images.exists():
-            return self.custom_images.first().image.url
-        return None
+    def get_image(self):
+        if self.custom_images.exists():
+            return self.custom_images.first()
+        return Image.objects.get(id=1)
 
     def get_absolute_url(self):
         return reverse('pizza_detail', args=[str(self.id)])
@@ -73,4 +74,3 @@ class Pizza(models.Model):
             models.Index(fields=['name']),
             models.Index(fields=['price']),
         ]
-
