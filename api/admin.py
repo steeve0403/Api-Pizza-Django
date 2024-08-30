@@ -9,6 +9,7 @@ from .models import Image, Pizza, Ingredient
 class IngredientInLine(admin.TabularInline):
     model = Pizza.ingredients.through
     extra = 1
+    can_delete = True
 
 
 class ImageInline(admin.TabularInline):
@@ -20,8 +21,7 @@ class ImageInline(admin.TabularInline):
 class PizzaAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description', 'price', 'vegetarian', 'available')
     search_fields = ['name', 'description', 'price', 'vegetarian', 'available']
-    inlines_images = [ImageInline]
-    inlines_ingredients = [IngredientInLine]
+    inlines = [ImageInline, IngredientInLine]
 
     def default_image(self, obj):
         if obj.default_image:
@@ -35,7 +35,7 @@ class PizzaAdmin(admin.ModelAdmin):
 # @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description')
-    search_fields = ['name', 'description']
+    search_fields = ['name']
 
 
 # @admin.register(Images)
