@@ -1,27 +1,49 @@
 from django.shortcuts import render
 from ninja import Router
-from .models import Pizza, Ingredient
-from .schemas import PizzaSchema, IngredientSchema
+from .models import Images, Pizza, Ingredient
+from .schemas import ImageSchema, PizzaSchema, IngredientSchema
 
 # Create your views here.
 
 router = Router()
 
 
+# Display all pizzas
 @router.get("/pizzas", response=list[PizzaSchema])
 def get_pizzas(request):
-    return Pizza.objects.all()
+    pizzas = Pizza.objects.select_related('default_image').prefetch_related('custom_images', 'ingredients').all()
+    return pizzas
+
+# Display only one pizza
+@router.get("/pizzas/{pizza_id}", response=PizzaSchema)
+def get_only_pizzas(request, pizza_id: int):
+    try:
+        pizza = Pizza.objects.get(id=pizza_id)
+        return pizza
+    except Pizza.DoesNotExist:
+        return {"error": "Pizza not found"}, 404
 
 
-# @router.get("/pizzas/{id}", response=list[PizzaSchema])
-# def get_only_pizzas(request):
-#     return Pizza.objects.get(pk=request.GET["id"])
-
-
+# Create one pizza
 @router.post("/pizzas", response=PizzaSchema)
 def create_pizza(request, response: PizzaSchema):
-    pizza_obj = Pizza.objects.create(**response.dict())
-    return pizza_obj
+    def create_pizza(request, data: PizzaSchema):
+        ingredients = Ingredient.objects.filter(id__in=[ingredient.id for ingredient in data.ingredients])
+        default_image = Images.objects.get(id=data.default_image.id)
+        custom_images = Images.objects.filter(id__in=[image.id for image in data.custom_images])
+
+        pizza = Pizza.objects.create(
+            name=data.name,
+            description=data.description,
+            price=data.price,
+            vegetarian=data.vegetarian,
+            available=data.available,
+            default_image=default_image
+        )
+        pizza.ingredients.set(ingredients)
+        pizza.custom_images.set(custom_images)
+        pizza.save()
+        return pizza
 
 
 @router.put("/pizzas/{pizza_id}", response=PizzaSchema)
