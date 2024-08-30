@@ -1,10 +1,9 @@
 from django.urls import path
-from ninja import NinjaAPI
-from .views import router
+from .api import api
 
+urlpatterns = [
+    # path('', api.urls),
+]
 
-app_name = 'api'
-api = NinjaAPI()
-api.add_router("/", router)
 
 
