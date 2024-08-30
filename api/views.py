@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from ninja import Router
-from .models import Images, Pizza, Ingredient
+from .models import Image, Pizza, Ingredient
 from .schemas import ImageSchema, PizzaSchema, IngredientSchema
 
 # Create your views here.
@@ -29,8 +29,8 @@ def get_only_pizzas(request, pizza_id: int):
 def create_pizza(request, response: PizzaSchema):
     def create_pizza(request, data: PizzaSchema):
         ingredients = Ingredient.objects.filter(id__in=[ingredient.id for ingredient in data.ingredients])
-        default_image = Images.objects.get(id=data.default_image.id)
-        custom_images = Images.objects.filter(id__in=[image.id for image in data.custom_images])
+        default_image = Image.objects.get(id=data.default_image.id)
+        custom_images = Image.objects.filter(id__in=[image.id for image in data.custom_images])
 
         pizza = Pizza.objects.create(
             name=data.name,
