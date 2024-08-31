@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from ninja import Router
 
-from ..jwt_auth import JWTAuth
 from ..models.category import Category
 from ..models.image import Image
 from ..models.ingredients import Ingredient
@@ -68,7 +67,7 @@ def update_pizza(request, pizza_id: int, data: PizzaUpdateSchema):
     return pizza
 
 
-@router.delete("/{pizza_id}", auth=JWTAuth)
+@router.delete("/{pizza_id}")
 def delete_pizza(request, pizza_id: int):
     pizza = get_object_or_404(Pizza, id=pizza_id)
     pizza.delete()
