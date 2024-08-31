@@ -1,5 +1,5 @@
 from ninja import Schema
-from pydantic import validator
+from pydantic import conlist, validator
 
 from ..models.pizza import Pizza
 from ..schemas.category import CategorySchema
@@ -13,21 +13,21 @@ class PizzaCreateSchema(Schema):
     price: float
     vegetarian: bool
     available: bool
-    ingredients: list[IngredientCreateSchema]
+    ingredients: conlist(int, min_length=3)
     categories: list[int] = []
     custom_images: list[int] = []
 
     @validator('price')
-    def check_price(cls, v):
-        if v <= 0:
+    def check_price(cls, value):
+        if value <= 0:
             raise ValueError("Price must be positive")
-        return v
+        return value
 
     @validator('ingredients')
-    def check_ingredients(cls, v):
-        if len(v) < 3:
+    def check_ingredients(cls, value):
+        if len(value) < 3:
             raise ValueError("A pizza must have at least 3 ingredients.")
-        return v
+        return value
 
 
 class PizzaUpdateSchema(Schema):
@@ -36,22 +36,22 @@ class PizzaUpdateSchema(Schema):
     price: float = None
     vegetarian: bool = None
     available: bool = None
-    ingredients: list[int] = None  # IDs des ingrédients
-    categories: list[int] = None  # IDs des catégories
-    default_image: int = None  # ID de l'image par défaut
-    custom_images: list[int] = None  # IDs des images personnalisées
+    ingredients: conlist(int, min_items=3) = None
+    categories: list[int] = None
+    default_image: int = None
+    custom_images: list[int] = None
 
     @validator('price', pre=True, always=True)
-    def check_price(cls, v):
-        if v is not None and v <= 0:
+    def check_price(cls, value):
+        if value is not None and value <= 0:
             raise ValueError("Price must be positive")
-        return v
+        return value
 
     @validator('ingredients', pre=True, always=True)
-    def check_ingredients(cls, v):
-        if v is not None and len(v) < 3:
+    def check_ingredients(cls, value):
+        if value is not None and len(value) < 3:
             raise ValueError("A pizza must have at least 3 ingredients.")
-        return v
+        return value
 
 
 class PizzaSchema(Schema):
@@ -65,16 +65,6 @@ class PizzaSchema(Schema):
     image: ImageSchema
     categories: list[CategorySchema] = []
 
-    @staticmethod
-    def from_orm(obj: Pizza):
-        return PizzaSchema(
-            id=obj.id,
-            name=obj.name,
-            description=obj.description,
-            price=obj.price,
-            vegetarian=obj.vegetarian,
-            available=obj.available,
-            ingredients=obj.ingredients,
-            image=ImageSchema.from_orm(obj.get_image())
-        )
+    class Config:
+        orm_mode = True
 
