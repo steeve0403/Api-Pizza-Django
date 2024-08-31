@@ -24,6 +24,7 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('api/auth', include('user_auth.urls')),
     path('', lambda request: redirect('api/docs'))
 ]
 
