@@ -7,18 +7,18 @@ from api.schemas.ingredients import IngredientSchema, IngredientCreateSchema, In
 
 router = Router()
 
-@router.get("/ingredients", response=list[IngredientSchema])
+@router.get("/", response=list[IngredientSchema])
 def list_ingredients(request):
     return Ingredient.objects.all()
 
 
-@router.get("/ingredients/{ingredient_id}", response=IngredientSchema)
+@router.get("/{ingredient_id}", response=IngredientSchema)
 def get_ingredient(request, ingredient_id: int):
     ingredient = get_object_or_404(Ingredient, id=ingredient_id)
     return ingredient
 
 
-@router.post("/ingredients", response=IngredientSchema)
+@router.post("/", response=IngredientSchema)
 def create_ingredient(request, data: IngredientCreateSchema):
     ingredient = Ingredient.objects.create(
         name=data.name,
@@ -33,7 +33,7 @@ def create_ingredient(request, data: IngredientCreateSchema):
     return ingredient
 
 
-@router.put("/ingredients/{ingredient_id}", response=IngredientSchema)
+@router.put("/{ingredient_id}", response=IngredientSchema)
 def update_ingredient(request, ingredient_id: int, data: IngredientUpdateSchema):
     ingredient = get_object_or_404(Ingredient, id=ingredient_id)
     for attr, value in data.dict(exclude_unset=True).items():

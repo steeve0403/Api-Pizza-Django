@@ -7,18 +7,18 @@ from api.schemas.image import ImageSchema
 router = Router()
 
 
-@router.get("/images", response=list[ImageSchema])
+@router.get("/", response=list[ImageSchema])
 def list_images(request):
     return Image.objects.all()
 
 
-@router.get("/images/{image_id}", response=ImageSchema)
+@router.get("/{image_id}", response=ImageSchema)
 def get_image(request, image_id: int):
     image = get_object_or_404(Image, id=image_id)
     return image
 
 
-@router.put("/images/{image_id}", response=ImageSchema)
+@router.put("/{image_id}", response=ImageSchema)
 def update_image(request, image_id: int, data: ImageSchema):
     image = get_object_or_404(Image, id=image_id)
     for attr, value in data.dict().items():
@@ -27,7 +27,7 @@ def update_image(request, image_id: int, data: ImageSchema):
     return image
 
 
-@router.delete("/images/{image_id}")
+@router.delete("/{image_id}")
 def delete_image(request, image_id: int):
     image = get_object_or_404(Image, id=image_id)
     image.delete()
