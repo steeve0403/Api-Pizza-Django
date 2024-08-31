@@ -47,3 +47,11 @@ class APIUsageSchema(BaseModel):
     request_count: int
     last_request_time: str
     tier: str
+
+class TokenSchema(BaseModel):
+    access_token: str
+    refresh_token: str
+
+
+class RefreshTokenSchema(BaseModel):
+    refresh_token: str

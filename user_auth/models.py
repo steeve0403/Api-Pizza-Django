@@ -32,3 +32,14 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
+
+class RefreshToken(models.Model):
+    token = models.CharField(max_length=255, unique=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    revoked_at = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.token
+
