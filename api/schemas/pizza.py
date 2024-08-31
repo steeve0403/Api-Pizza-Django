@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ninja import Schema
 from pydantic import conlist, validator
 
@@ -36,7 +38,7 @@ class PizzaUpdateSchema(Schema):
     price: float = None
     vegetarian: bool = None
     available: bool = None
-    ingredients: conlist(int, min_items=3) = None
+    ingredients: conlist(int, min_length=3) = None
     categories: list[int] = None
     default_image: int = None
     custom_images: list[int] = None
@@ -62,7 +64,7 @@ class PizzaSchema(Schema):
     vegetarian: bool
     available: bool
     ingredients: list[IngredientSchema] = []
-    image: ImageSchema
+    image: Optional[ImageSchema] = None
     categories: list[CategorySchema] = []
 
     class Config:

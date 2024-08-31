@@ -4,6 +4,7 @@ from enum import Enum
 
 from api.schemas.image import ImageSchema
 
+
 class IngredientType(str, Enum):
     vegetable = 'vegetable'
     meat = 'meat'
@@ -43,9 +44,8 @@ class IngredientSchema(Schema):
 
     @validator('allergens', pre=True, always=True)
     def validate_allergens(cls, value):
-        if isinstance(value, str):
-            return [allergen.strip for allergen in value.split(',')]
-        return value
-
-
-
+        if isinstance(value, list):
+            return ', '.join([str(allergen).strip() for allergen in value])
+        elif isinstance(value, str):
+            return value.strip()
+        return ''

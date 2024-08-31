@@ -6,14 +6,13 @@ from .views.ingredients import router as ingredient_router
 from .views.image import router as image_router
 from .views.category import router as category_router
 
-# Configuration de l'API
 api = NinjaAPI(
-    auth=JWTAuth(),
+    # auth=JWTAuth(),
     title="Pizza API",
     version="1.0.0",
     description="API pour gérer les pizzas, les ingrédients et les catégories.",
-    # docs_url="/api/docs",  # URL de la documentation interactive
-    openapi_url="/openapi.json"  # URL de la documentation OpenAPI)
+    # docs_url="/api/docs",
+    openapi_url="/openapi.json"
 )
 """
     title="Pizza API",
