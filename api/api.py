@@ -8,6 +8,7 @@ from .views.category import router as category_router
 
 # Configuration de l'API
 api = NinjaAPI(
+    auth=JWTAuth(),
     title="Pizza API",
     version="1.0.0",
     description="API pour gérer les pizzas, les ingrédients et les catégories.",
