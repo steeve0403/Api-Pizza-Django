@@ -9,3 +9,7 @@ class Image(models.Model):
 
     def __str__(self):
         return self.description or f"Image {self.id}"
+
+    class Meta:
+        verbose_name = 'Image'
+    verbose_name_plural = 'Images'

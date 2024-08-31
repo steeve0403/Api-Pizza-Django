@@ -35,6 +35,8 @@ class Pizza(models.Model):
         return reverse('pizza_detail', args=[str(self.id)])
 
     class Meta:
+        verbose_name = 'Pizza'
+        verbose_name_plural = 'Pizzas'
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['price']),

@@ -25,3 +25,7 @@ class Ingredient(models.Model):
         if self.type == 'meat' and self.name.lower() in ['ham', 'bacon']:
             raise ValidationError('This ingredient cannot be added to vegetarian pizzas.')
 
+
+    class Meta:
+        verbose_name = 'Ingredient'
+    verbose_name_plural = 'Ingredients'
