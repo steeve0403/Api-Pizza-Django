@@ -1,14 +1,16 @@
 import jwt
 from datetime import datetime, timedelta
+from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from ninja import Router
 from ninja.errors import HttpError
 
 from .models import CustomUser, RefreshToken
-from .schemas import UserSchema, UserLoginSchema, TokenSchema, RefreshTokenSchema
+from .schemas import UserSchema, UserCreateSchema, UserLoginSchema, TokenSchema, RefreshTokenSchema
 
 router = Router()
+
 
 def create_access_token(user_id: int):
     payload = {
@@ -18,6 +20,7 @@ def create_access_token(user_id: int):
     }
     return jwt.encode(payload, settings.JWT_SETTINGS['SECRET_KEY'])
 
+
 def create_refresh_token(user):
     token = jwt.encode({
         'user_id': user.id,
@@ -26,6 +29,22 @@ def create_refresh_token(user):
     }, settings.JWT_SETTINGS['SECRET_KEY'], algorithm=settings.JWT_SETTINGS['ALGORITHM'])
     RefreshToken.objects.create(user=user, token=token)
     return token
+
+
+@router.post("/register", response=UserSchema)
+def register(request, data: UserCreateSchema):
+    if CustomUser.objects.filter(username=data.username).exists():
+        raise HttpError(400, "Username already taken")
+    if CustomUser.objects.filter(email=data.email).exists():
+        raise HttpError(400, "Email already taken")
+
+    user = CustomUser.objects.create_user(
+        username=data.username,
+        password=make_password(data.password),
+        email=data.email,
+    )
+    return user
+
 
 @router.post("/login", response=TokenSchema)
 def login(request, data: UserLoginSchema):
@@ -38,10 +57,12 @@ def login(request, data: UserLoginSchema):
 
     return {"access_token": access_token, "refresh_token": refresh_token}
 
+
 @router.post("/token/refresh", response=TokenSchema)
 def token_refresh(request, data: RefreshTokenSchema):
     try:
-        payload = jwt.decode(data.refresh_token, settings.JWT_SETTINGS['SIGNING_KEY'], algorithms=[settings.JWT_SETTINGS['ALGORITHM']])
+        payload = jwt.decode(data.refresh_token, settings.JWT_SETTINGS['SIGNING_KEY'],
+                             algorithms=[settings.JWT_SETTINGS['ALGORITHM']])
         refresh_token_obj = RefreshToken.objects.filter(token=data.refresh_token, revoked=False).first()
         if not refresh_token_obj or payload['user_id'] != refresh_token_obj.user_id:
             raise HttpError(401, "Invalid refresh token")
@@ -52,6 +73,7 @@ def token_refresh(request, data: RefreshTokenSchema):
         raise HttpError(401, "Refresh token has expired")
     except jwt.InvalidTokenError:
         raise HttpError(401, "Invalid token")
+
 
 @router.post("/logout")
 def logout(request, data: RefreshTokenSchema):

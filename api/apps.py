@@ -5,11 +5,8 @@ class PizzaAppConfig(AppConfig):
     name = 'api'
 
     def ready(self):
-        # Connexion des signaux lors de l'initialisation de l'application
-        from . import signals  # Importer le module des signaux
         from django.conf import settings
-        # Vérification du mode de fonctionnement (dev ou prod)
         if settings.DEBUG:
-            print("L'application est en mode développement.")
+            print("The application is in development mode.")
         else:
-            print("L'application est en mode production.")
+            print("The application is in production mode.")

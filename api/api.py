@@ -1,6 +1,6 @@
 from ninja import NinjaAPI
 
-from .jwt_auth import JWTAuth
+from user_auth.security import JWTAuth
 from .views.pizza import router as pizza_router
 from .views.ingredients import router as ingredient_router
 from .views.image import router as image_router
