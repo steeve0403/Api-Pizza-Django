@@ -10,7 +10,7 @@ api = NinjaAPI(
     # auth=JWTAuth(),
     title="Pizza API",
     version="1.0.0",
-    description="API pour gérer les pizzas, les ingrédients et les catégories.",
+    description="API to manage pizza and ingredients",
     # docs_url="/api/docs",
     openapi_url="/openapi.json"
 )

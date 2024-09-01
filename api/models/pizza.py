@@ -61,9 +61,19 @@ class Pizza(models.Model):
             models.Index(fields=['available']),
         ]
 
+
 @receiver(m2m_changed, sender=Pizza.ingredients.through)
 def update_pizza_price(sender, instance, action, **kwargs):
     if action == ['post_add', 'post_remove']:
         instance.price = instance.total_ingredient_cost()
         instance.save()
 
+
+class PizzaHistory(models.Model):
+    pizza = models.ForeignKey(Pizza, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    vegetarian = models.BooleanField(default=False)
+    available = models.BooleanField(default=True)
+    date_modified = models.DateTimeField(auto_now_add=True)
