@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr, constr, validator
 from typing import Optional
+import re
 
 
 class UserSchema(BaseModel):
@@ -19,6 +20,25 @@ class UserCreateSchema(BaseModel):
     email: EmailStr
     password: constr(min_length=8)
 
+    @validator('username')
+    def validate_username(cls, value):
+        if not re.match(r"^[a-zA-Z0-9_]+$", value):
+            raise ValueError('Username can only contain letters, numbers, and underscores')
+        return value
+    @validator('password')
+    def validate_password(cls, value):
+        if len(value) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r"[A-Z]", value):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r"[a-z]", value):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r"\d", value):
+            raise ValueError('Password must contain at least one digit')
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", value):
+            raise ValueError('Password must contain at least one special character')
+        return value
+
 
 class UserLoginSchema(BaseModel):
     username: str
@@ -36,6 +56,20 @@ class PasswordChangeSchema(BaseModel):
     old_password: str
     new_password: constr(min_length=8)
 
+    @validator('new_password')
+    def validate_new_password(cls, value):
+        if len(value) < 8:
+            raise ValueError('New password must be at least 8 characters long')
+        if not re.search(r"[A-Z]", value):
+            raise ValueError('New password must contain at least one uppercase letter')
+        if not re.search(r"[a-z]", value):
+            raise ValueError('New password must contain at least one lowercase letter')
+        if not re.search(r"\d", value):
+            raise ValueError('New password must contain at least one digit')
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", value):
+            raise ValueError('New password must contain at least one special character')
+        return value
+
 
 class TokenSchema(BaseModel):
     access_token: str
@@ -47,6 +81,7 @@ class APIUsageSchema(BaseModel):
     request_count: int
     last_request_time: str
     tier: str
+
 
 class TokenSchema(BaseModel):
     access_token: str

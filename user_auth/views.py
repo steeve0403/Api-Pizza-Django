@@ -67,8 +67,13 @@ def token_refresh(request, data: RefreshTokenSchema):
         if not refresh_token_obj or payload['user_id'] != refresh_token_obj.user_id:
             raise HttpError(401, "Invalid refresh token")
 
+        refresh_token_obj.revoked = True
+        refresh_token_obj.save()
+
+        new_refresh_token = create_refresh_token(refresh_token_obj.user)
+
         access_token = create_access_token(payload['user_id'])
-        return {"access_token": access_token, "refresh_token": data.refresh_token}
+        return {"access_token": access_token, "refresh_token": new_refresh_token}
     except jwt.ExpiredSignatureError:
         raise HttpError(401, "Refresh token has expired")
     except jwt.InvalidTokenError:
